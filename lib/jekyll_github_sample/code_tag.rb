@@ -16,8 +16,12 @@ module JekyllGithubSample
     end
 
     def render(context)
-      all_lines = cache.fetch(@github_file.raw_uri) do
-        open(@github_file.raw_uri).readlines
+      begin
+        all_lines = cache.fetch(@github_file.raw_uri) do
+          open(@github_file.raw_uri).readlines
+        end
+      rescue SocketError => e
+        raise StandardError.new("Cannot open #{@github_file.raw_uri}")
       end
       lines     = all_lines[@line_start..@line_end]
       lines     = remove_common_indentation(lines)
